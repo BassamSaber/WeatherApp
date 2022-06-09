@@ -30,6 +30,8 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/et_search"
                 android:layout_width="0dp"
+                android:hint="@string/enter_city_name"
+                android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_height="@dimen/_28sdp"
                 android:inputType="text"
                 android:imeOptions="actionDone"

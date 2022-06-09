@@ -2,6 +2,7 @@ package com.samz.weatherapp.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -31,6 +32,16 @@ import com.samz.weatherapp.remote.MainRepository
 import com.samz.weatherapp.utils.GpsUtils
 import com.samz.weatherapp.utils.MyViewModelFactory
 import java.util.*
+import com.google.android.gms.location.LocationServices
+
+import androidx.core.app.ActivityCompat
+
+import com.google.android.gms.location.LocationResult
+
+import com.google.android.gms.location.LocationCallback
+
+
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainViewModel
@@ -102,7 +113,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode==121){
+        if(requestCode==121 && resultCode == Activity.RESULT_OK){
             checkPermissions{
                 getCurrentLocationWeather()
             }
@@ -120,10 +131,45 @@ class MainActivity : AppCompatActivity() {
                 if (!result.isNullOrEmpty())
                     viewModel.getCityWeather(result[0].adminArea)
 
-            }
+            }else
+                requestLocation { newLocation->
+                    fusedLocationClient.removeLocationUpdates(mLocationCallback)
+                    val geocoder = Geocoder(this, Locale.UK)
+                    val result =
+                        geocoder.getFromLocation(newLocation.latitude, newLocation.longitude, 1)
+                    if (!result.isNullOrEmpty())
+                        viewModel.getCityWeather(result[0].adminArea)
+                }
         }
             .addOnFailureListener { _ ->
             }
+    }
+    private lateinit var mLocationCallback: LocationCallback
+    private fun requestLocation(callback: (Location) -> Unit) {
+        val mLocationRequest = LocationRequest.create()
+        mLocationRequest.interval = 60000
+        mLocationRequest.fastestInterval = 5000
+        mLocationRequest.priority = LocationRequest.PRIORITY_LOW_POWER
+        mLocationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    if (location != null) {
+                        callback(location)
+                    }
+                }
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null)
+        }
     }
 
     private fun checkPermissions(callback: (() -> Unit)? = null) {
