@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Weather App</string>
+    <string name="please_enable_location">Please enable location to get your current location weather</string>
+</resources>

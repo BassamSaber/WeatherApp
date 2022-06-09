@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.MainActivity">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="com.samz.weatherapp.ui.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/ll_search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:background="@drawable/search_view_bg"
+            android:paddingVertical="@dimen/_6sdp"
+            android:paddingHorizontal="@dimen/_6sdp">
+            
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_28sdp"
+                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:background="@null"
+                android:text="@={viewModel.cityName}"
+                android:layout_weight="1"/>
+            
+            <ImageView
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:padding="@dimen/_4sdp"
+                android:onClick="@{()->viewModel.onGetSearchCityWeather()}"
+                android:src="@drawable/ic_arrow_next"/>
+        </LinearLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:visibility="@{!viewModel.weatherTemp.isEmpty()? View.VISIBLE : View.GONE}"
+            app:layout_constraintTop_toBottomOf="@id/ll_search_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_weather"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintWidth_percent="0.2"
+                app:layout_constraintDimensionRatio="1:1"
+                android:src="@drawable/ic_weather"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tv_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="20"
+                android:textSize="@dimen/_31ssp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="@{viewModel.weatherTemp}"
+                android:layout_marginTop="@dimen/_14sdp"
+                app:layout_constraintTop_toBottomOf="@id/iv_weather"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="o"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="@dimen/_18sdp"
+                android:layout_marginStart="@dimen/_3sdp"
+                app:layout_constraintStart_toEndOf="@id/tv_temp"
+                app:layout_constraintTop_toTopOf="@id/tv_temp"
+                tools:ignore="HardcodedText" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@{viewModel.weatherValue}"
+                android:textSize="@dimen/_24sdp"
+                tools:text="Clear"
+                app:layout_constraintTop_toBottomOf="@id/tv_temp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:visibility="gone"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
+            app:layout_constraintTop_toBottomOf="@id/ll_search_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:visibility="gone"
+            android:background="@color/white"
+            android:visibility="@{!viewModel.errorMsg.isEmpty()? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_search_view">
+
+            <ImageView
+                android:id="@+id/iv_error"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_error"
+                app:layout_constraintWidth_percent="0.2"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintWidth_percent="0.7"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textSize="@dimen/_14ssp"
+                android:text="@{viewModel.errorMsg}"
+                tools:text="Something went wrong"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_error"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
